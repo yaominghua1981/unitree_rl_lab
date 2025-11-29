@@ -1,0 +1,34 @@
+# .github/workflows/sync-to-gitcode.yml
+name: Sync to GitCode
+
+on:
+  push:
+    branches: [ main ]  # 当你的 main 分支有推送时触发
+  workflow_dispatch:    # 允许手动触发（可选）
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0    # 获取完整历史，确保能推送所有分支
+      
+      - name: Setup Git
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+      
+      - name: Push to GitCode
+        env:
+          GITCODE_TOKEN: ${{ secrets.GITCODE_TOKEN }}
+        run: |
+          # 添加 GitCode 远程仓库（使用你的实际信息）
+          git remote add gitcode https://yaominghua1981:${GITCODE_TOKEN}@gitcode.com/yaominghua1981/unitree_rl_lab.git
+          
+          # 推送到 GitCode 的 main 分支
+          git push -f gitcode main
+          
+          # 如果还有其他分支需要同步，可以添加更多 push 命令
+          # git push -f gitcode dev  # 示例：同步 dev 分支
